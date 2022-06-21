@@ -22,7 +22,8 @@ class Recipe:
     
     def __new__(cls, ingredients):
         if not cls._configured:
-            raise ValueError("Recipe class must be configured before recipes can be created")
+            cls.configure({})
+            # raise ValueError("Recipe class must be configured before recipes can be created")
         # Some basic argument verification
         if not ingredients or not hasattr(ingredients, '__iter__') or len(ingredients) == 0:
             raise ValueError("Invalid input recipe. Must be ingredients iterable with non-zero length")
@@ -1196,6 +1197,10 @@ class OvercookedGridworld(object):
                         obj = player.remove_object()
                         soup.add_ingredient(obj)
                         shaped_reward[player_idx] += self.reward_shaping_params["PLACEMENT_IN_POT_REW"]
+
+                        # Start cooking without extra INTERACT action if recipe is done
+                        if self.soup_to_be_cooked_at_location(new_state, i_pos) and soup.is_full and soup.is_valid:
+                            soup.begin_cooking()
 
                         # Log potting
                         self.log_object_potting(events_infos, new_state, old_soup, soup, obj.name, player_idx)
